@@ -2,7 +2,7 @@ const Order = require('../../../models/order')
 const moment = require('moment')
 function orderController(){
     return{
-        store(req,res){
+        async store(req,res){
             // console.log(req.body)
 
             //.... validate request
@@ -19,20 +19,36 @@ function orderController(){
                 address
             })
 
-            order.save().then(result =>{
-                Order.populate(result,{path:'customerId'},(err,placedOrder)=>{
-                    req.flash('success','Order placed successfully')
-                    delete req.session.cart
-                    //.... Emit
-                    const eventEmitter=req.app.get('eventEmitter')
-                    eventEmitter.emit('orderPlaced',result)
-                    return res.redirect('/customer/orders')
-                })
+            // order.save().then(result =>{
+            //     Order.populate(result,{path:'customerId'},(err,placedOrder)=>{
+            //         req.flash('success','Order placed successfully')
+            //         delete req.session.cart
+            //         //.... Emit
+            //         const eventEmitter=req.app.get('eventEmitter')
+            //         eventEmitter.emit('orderPlaced',result)
+            //         return res.redirect('/customer/orders')
+            //     })
               
-            }).catch(err =>{
-                req.flash('error','Something went wrong')
-                return res.redirect('/cart')
-            })
+            // }).catch(err =>{
+            //     req.flash('error','Something went wrong')
+            //     return res.redirect('/cart')
+            // })
+            try {
+                const result = await order.save();
+                
+                const placedOrder = await Order.populate(result, { path: 'customerId' }).execPopulate();
+            
+                req.flash('success', 'Order placed successfully');
+                delete req.session.cart;
+                
+                const eventEmitter = req.app.get('eventEmitter');
+                eventEmitter.emit('orderPlaced', result);
+                
+                return res.redirect('/customer/orders');
+            } catch (err) {
+                req.flash('error', 'Something went wrong');
+                return res.redirect('/cart');
+            }
 
         },
         async index(req, res) {

@@ -16,8 +16,8 @@ const Emitter = require('events')
 
 
 //.... Database Connection 
-const url = 'mongodb://localhost/pizza'
-mongoose.connect(url,
+//const url = 
+mongoose.connect(process.env.MONGO_CONNECTION_URL,
   {
     useNewUrlParser: true,
     //useCreateIndex:true,
@@ -89,6 +89,9 @@ app.set('view engine','ejs')
 
 
 require('./routes/web.js')(app)
+app.use((req,res)=>{
+  res.status(404).render('error/404')
+})
 
 const server = app.listen(PORT , ()=>{
     console.log(`Listening on port ${PORT}`)
