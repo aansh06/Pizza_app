@@ -2,7 +2,7 @@
   "name": "pizza_app",
   "version": "1.0.0",
   "description": "A Realtime Pizza App",
-  "main": "index.js",
+  "main": "server.js",
   "author": "Anshuman",
   "scripts": {
     "serve": "node server.js",
